@@ -29,11 +29,11 @@ namespace SaleaeLogger
             Register(CallerLoggingEventHandler);
         }
 
-        public void StartScan()
+        public void StartScan(int rate)
         {
             StopScan();
             canTokSrc = new CancellationTokenSource();
-            Task.Factory.StartNew(() => { LoggingScanThread(canTokSrc.Token, ScanSeconds); }, canTokSrc.Token);
+            Task.Factory.StartNew(() => { LoggingScanThread(canTokSrc.Token, ScanSeconds, rate); }, canTokSrc.Token);
         }
 
         public void StopScan()
@@ -46,11 +46,9 @@ namespace SaleaeLogger
         }
 
 
-        private void LoggingScanThread(CancellationToken canTok, int seconds)
+        private void LoggingScanThread(CancellationToken canTok, int seconds, int rate)
         {
             Thread.CurrentThread.Name = "LoggingScanThread";
-
-            saleae.SetActiveChannels(null, new int[] { 0, 1, 2, 3, 4, 5, 6 });
 
             // **** Turn off all triggers ****
             SaleaeAutomationApi.Trigger[] t = new SaleaeAutomationApi.Trigger[8];
@@ -58,17 +56,6 @@ namespace SaleaeLogger
             {
                 t[i] = SaleaeAutomationApi.Trigger.None;
             }
-            //saleae.SetTrigger(t);
-
-            // **** Use lowest analog sample rate possible ****
-            var sampRates = saleae.GetAvailableSampleRates();
-            int minSampleRateDesired = 100; // Hz
-            var minAnaRate = (from r in sampRates where r.AnalogSampleRate >= minSampleRateDesired
-                              select r.AnalogSampleRate).Min();
-
-            var rateStruct = (from r in sampRates where r.AnalogSampleRate == minAnaRate select r).First();
-            saleae.SetSampleRate(rateStruct);
-            var rate = (rateStruct.DigitalSampleRate > 0) ? (rateStruct.DigitalSampleRate) : (rateStruct.AnalogSampleRate);
 
             saleae.SetNumSamples(BurstSeconds * rate);
 

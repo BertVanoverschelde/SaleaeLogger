@@ -26,11 +26,13 @@ namespace SaleaeLogger
 
         DateTime connectedTime = DateTime.Now;
 
-
+        private volatile bool ChangeRate = true;
 
         public MainWindow()
         {
             InitializeComponent();
+            cmbMode.Items.Add("Analog");
+            cmbMode.Items.Add("Digital");
         }
 
         private void Window_Closed(object sender, EventArgs e)
@@ -46,6 +48,7 @@ namespace SaleaeLogger
             {
                 vm.Connect(SaleaeEventHandler, LoggingEventHandler);
                 connectedTime = DateTime.Now;
+                cmbMode.SelectedIndex = 0;
             }
             catch
             {
@@ -120,6 +123,29 @@ namespace SaleaeLogger
             }
 
             scrollMonitor.ScrollToBottom();
+        }
+
+        private void cmbMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ChangeRate = false;
+            List<string> sampleRates = vm.SelectMode(cmbMode.SelectedIndex);
+            cmbRate.SelectedIndex = 0;
+            cmbRate.Items.Clear();
+
+            foreach(string str in sampleRates)
+            {
+                cmbRate.Items.Add(str);
+            }
+
+            ChangeRate = true;
+        }
+
+        private void cmbRate_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (ChangeRate)
+            {
+                vm.SelectRate(cmbRate.SelectedIndex);
+            }
         }
     }
 }

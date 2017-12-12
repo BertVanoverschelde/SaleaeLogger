@@ -22,6 +22,13 @@
                 <Button DockPanel.Dock="Top" Content="Start Logging" Click="StartLogging_Click" Margin="10,0" IsEnabled="{Binding HasConnection}"/>
                 
             </DockPanel>
+            <DockPanel DockPanel.Dock="Top" Margin="10">
+                <Label DockPanel.Dock="Left" Content="Mode:"/>
+                <ComboBox x:Name="cmbMode" DockPanel.Dock="Left" Text="{Binding sampleMode}" Width="80" HorizontalContentAlignment="Center" IsReadOnly="True" SelectionChanged="cmbMode_SelectionChanged"/>
+                <Label DockPanel.Dock="Left" Content="Sample Rate:"/>
+                <ComboBox x:Name="cmbRate" DockPanel.Dock="Left" Text="{Binding sampleRate}" Width="120" HorizontalContentAlignment="Center" IsReadOnly="True" SelectionChanged="cmbRate_SelectionChanged"/>
+                <Label DockPanel.Dock="Left" Content="S/s"/>
+            </DockPanel>
 
 
             <Button DockPanel.Dock="Bottom" Content="Stop Logging" Click="StopLogging_Click" Margin="10"/>

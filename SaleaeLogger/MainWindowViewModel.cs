@@ -20,16 +20,61 @@ namespace SaleaeLogger
         private ConnectedDevices dev;
 
         public int ScanSeconds { get; set; }
+        public int sampleMode { get; set; }
+        public int sampleRate { get; set; }
         public int BurstSeconds { get; set; }
         public bool HasConnection { get { return (saleae != null);} }
 
         private LoggingThread logger;
         private EventHandler<LoggingEventArgs> CallerLoggingEventHandler;
+        private List<SampleRate> smpRates = new List<SampleRate>();
 
         public MainWindowViewModel()
         {
             ScanSeconds = 1800;
             BurstSeconds = 5;
+        }
+
+        public List<string> SelectMode(int mode)
+        {
+            List<string> sampleRates = new List<string>();
+
+            if(HasConnection)
+            {
+                if(mode > 0)
+                {
+                    saleae.SetActiveChannels(new int[] { 0, 1, 2, 3, 4, 5, 6, 7 }, null);
+                }
+                else
+                {
+                    saleae.SetActiveChannels(null, new int[] { 0, 1, 2, 3, 4, 5, 6, 7 });
+                }
+
+                smpRates = saleae.GetAvailableSampleRates();
+
+                foreach(SampleRate sr in smpRates)
+                {
+                    if (mode > 0)
+                    {
+                        sampleRates.Add(sr.DigitalSampleRate.ToString());
+                    }
+                    else
+                    {
+                        sampleRates.Add(sr.AnalogSampleRate.ToString());
+                    }
+                }
+            }
+
+            return sampleRates;
+        }
+
+        public void SelectRate(int rate)
+        {
+            if (HasConnection)
+            {
+                saleae.SetSampleRate(smpRates[rate]);
+                sampleRate = (smpRates[rate].AnalogSampleRate > 0) ? smpRates[rate].AnalogSampleRate : smpRates[rate].DigitalSampleRate;
+            }
         }
         
         public void Connect(EventHandler<SaleaeStringEventArgs> saleaeApiMonitor = null,
@@ -89,14 +134,9 @@ namespace SaleaeLogger
                 BurstSeconds = 5;
                 OnPropertyChanged("BurstSeconds");
             }
-            else if( BurstSeconds > 120 )
-            {
-                BurstSeconds = 120;
-                OnPropertyChanged("BurstSeconds");
-            }
 
             logger = new LoggingThread(saleae, ScanSeconds, BurstSeconds, CallerLoggingEventHandler);
-            logger.StartScan();
+            logger.StartScan(sampleRate);
         }
 
 
