@@ -5,7 +5,7 @@ First you must set up your Logic software to enable the "scripting socket server
 
 This program will trigger the Logic software to start a new capture as soon as possible when the previous capture ends.  The data will be saved as separete files under C:\_LogicData.  There will be gaps of time where no samples are taken, but it is better than nothing.
 
-One major advantage this have over traditional data loggers is that the sample rate is very high.
+One major advantage this has over traditional data loggers is that the sample rate is very high.
 
 <hr>
 
