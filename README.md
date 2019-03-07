@@ -10,4 +10,4 @@ One major advantage this has over traditional data loggers is that the sample ra
 <hr>
 
 Note that code in SaleaeAutomationApi  is based on
-http://support.saleae.com/hc/en-us/articles/201104764
+https://support.saleae.com/saleae-api-and-sdk/socket-api
